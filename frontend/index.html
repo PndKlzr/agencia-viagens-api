@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agência de Viagens</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agência de Viagens</h1>
+    <div>
+        <h2>Cadastrar Destino</h2>
+        <form id="cadastroForm">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+            <label for="localizacao">Localização:</label>
+            <input type="text" id="localizacao" name="localizacao" required>
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" name="descricao" required>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+    <div>
+        <h2>Destinos Cadastrados</h2>
+        <button onclick="listarDestinos()">Listar Destinos</button>
+        <ul id="destinosList"></ul>
+    </div>
+    <script>
+        const apiUrl = 'http://localhost:8080/destinos';
+
+        document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const localizacao = document.getElementById('localizacao').value;
+            const descricao = document.getElementById('descricao').value;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nome, localizacao, descricao, avaliacaoMedia: 0, numeroAvaliacoes: 0 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Destino cadastrado com sucesso!');
+                document.getElementById('cadastroForm').reset();
+            })
+            .catch(error => console.error('Erro:', error));
+        });
+
+        function listarDestinos() {
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const destinosList = document.getElementById('destinosList');
+                destinosList.innerHTML = '';
+                data.forEach(destino => {
+                    const li = document.createElement('li');
+                    li.textContent = `${destino.nome} - ${destino.localizacao} - ${destino.descricao}`;
+                    destinosList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+</body>
+</html>
